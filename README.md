@@ -1,7 +1,8 @@
 Moodle Time Machine (local_timemachine)
 ======================================
 
-Admin-only local plugin (Moodle 4.5+) to automatically back up all courses in a selected category when content changes are detected. Keeps up to 7 backup versions per course, stores them under moodledata in the fixed folder "MoodleTimeMachine" and optionally uploads each backup to an FTP server.
+Admin-only local plugin (Moodle 4.5+) that automatically backs up all courses in a selected category when content changes are detected. It stores backups under moodledata/MoodleTimeMachine and can also upload each archive to an FTP server.
+The number of backup versions kept is configurable by the administrator (default: 7).
 
 Key features
 - Admin-only access and configuration
