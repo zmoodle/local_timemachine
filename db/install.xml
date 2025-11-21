@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XMLDB PATH="local/timemachine/db" VERSION="2025111200" COMMENT="XMLDB file for local_timemachine" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://docs.moodle.org/xmldb/xmldb.xsd">
+  <TABLES>
+    <TABLE NAME="local_timemachine_course" COMMENT="Per-course signatures and last backup info">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="lastsignature" TYPE="char" LENGTH="64" NOTNULL="false"/>
+        <FIELD NAME="lastbackup" TYPE="int" LENGTH="10" NOTNULL="false"/>
+        <FIELD NAME="queuedat" TYPE="int" LENGTH="10" NOTNULL="false"/>
+        <FIELD NAME="failcount" TYPE="int" LENGTH="10" NOTNULL="false"/>
+        <FIELD NAME="lastfail" TYPE="int" LENGTH="10" NOTNULL="false"/>
+        <FIELD NAME="lastnotified" TYPE="int" LENGTH="10" NOTNULL="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="courseid_uq" TYPE="unique" FIELDS="courseid"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="categoryid_ix" UNIQUE="false" FIELDS="categoryid"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="local_timemachine_backup" COMMENT="Backup versions per course">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="filepath" TYPE="text" LENGTH="big" NOTNULL="true"/>
+        <FIELD NAME="filesize" TYPE="int" LENGTH="10" NOTNULL="false"/>
+        <FIELD NAME="signature" TYPE="char" LENGTH="64" NOTNULL="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="courseid_ix" UNIQUE="false" FIELDS="courseid"/>
+        <INDEX NAME="course_time_ix" UNIQUE="false" FIELDS="courseid,timecreated"/>
+        <INDEX NAME="timecreated_ix" UNIQUE="false" FIELDS="timecreated"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="local_timemachine_log" COMMENT="Detailed failure logs for backups">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="level" TYPE="char" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="message" TYPE="text" LENGTH="small" NOTNULL="true"/>
+        <FIELD NAME="details" TYPE="text" LENGTH="big" NOTNULL="false"/>
+        <FIELD NAME="runid" TYPE="char" LENGTH="64" NOTNULL="false"/>
+        <FIELD NAME="context" TYPE="text" LENGTH="small" NOTNULL="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="courseid_ix" UNIQUE="false" FIELDS="courseid"/>
+        <INDEX NAME="timecreated_ix" UNIQUE="false" FIELDS="timecreated"/>
+        <INDEX NAME="runid_ix" UNIQUE="false" FIELDS="runid"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>
