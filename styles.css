@@ -1,0 +1,11 @@
+.tm-toggle{cursor:pointer;display:inline-flex;align-items:center}
+.tm-child{display:none}
+.tm-main{border-left:4px solid transparent}
+.tm-child-row{opacity:.95}
+.tm-arrow{margin-right:6px;display:inline-block}
+.tm-stats{margin-top:10px;margin-bottom:18px}
+.tm-stat-card{background:#f8fafc;border:1px solid #dfe5ec;border-radius:10px;padding:18px;box-shadow:0 2px 4px rgba(0,0,0,0.06);height:100%}
+.tm-stat-label{font-size:.95rem;color:#4a5568;margin-bottom:6px;font-weight:600}
+.tm-stat-value{font-size:1.4rem;font-weight:700;color:#1a202c}
+.tm-stat-detail{font-size:.85rem;color:#6b7280}
+.tm-search{margin-bottom:12px}

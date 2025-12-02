@@ -20,7 +20,7 @@
  * Lists backups grouped by course and allows secure download/deletion.
  *
  * @package   local_timemachine
- * @copyright 2025 zMoodle (https://app.zmoodle.com)
+ * @copyright 2025 GiDA
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -45,23 +45,30 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('admin');
 $PAGE->set_heading(get_string('pluginname', 'local_timemachine'));
 $PAGE->set_title(get_string('managebackups', 'local_timemachine'));
+$PAGE->requires->js_call_amd('local_timemachine/index', 'init');
 
 // Stats for dashboard strip.
 $distinctcourses = (int)$DB->get_field_sql('SELECT COUNT(DISTINCT courseid) FROM {local_timemachine_backup}');
-$totalversions = (int)$DB->count_records('local_timemachine_backup');
-$totalbytes = (int)$DB->get_field_sql('SELECT COALESCE(SUM(filesize), 0) FROM {local_timemachine_backup}');
+$storagestats = \local_timemachine\local\backupper::get_storage_stats();
+$totalversions = $storagestats['totalversions'];
+$totalbytes = $storagestats['totalbytes'];
 $lastsummary = (int)get_config('local_timemachine', 'lastsummarysent');
 $since = $lastsummary > 0 ? $lastsummary : (time() - DAYSECS);
-$backupsince = (int)$DB->get_field_sql('SELECT COUNT(1) FROM {local_timemachine_backup} WHERE timecreated >= :since', ['since' => $since]);
-$sinceLabel = $lastsummary > 0 ? userdate($lastsummary) : get_string('stat_never', 'local_timemachine');
+$backupsince = (int)$DB->get_field_sql(
+    'SELECT COUNT(1) FROM {local_timemachine_backup} WHERE timecreated >= :since',
+    ['since' => $since]
+);
+$sincelabel = $lastsummary > 0 ? userdate($lastsummary) : get_string('stat_never', 'local_timemachine');
 
 // Handle actions.
 if ($action === 'download' && $backupid) {
     require_sesskey();
     $rec = $DB->get_record('local_timemachine_backup', ['id' => $backupid], '*', MUST_EXIST);
-    if (!empty($rec->filepath) &&
+    if (
+        !empty($rec->filepath) &&
         \local_timemachine\local\backupper::is_within_storage($rec->filepath) &&
-        is_readable($rec->filepath)) {
+        is_readable($rec->filepath)
+    ) {
         send_file($rec->filepath, basename($rec->filepath), 0, 0, false, true);
     } else {
         throw new moodle_exception('filenotfound', 'error');
@@ -95,20 +102,19 @@ echo $OUTPUT->heading(get_string('managebackups', 'local_timemachine'));
 echo html_writer::start_div('tm-stats row');
 $cards = [
     [
-        // Labels requested in Italian for the dashboard strip.
-        'label' => 'Backup generati',
+        'label' => get_string('stat_backups_generated', 'local_timemachine'),
         'value' => $totalversions,
-        'detail' => get_string('stat_courses_detail', 'local_timemachine', $distinctcourses)
+        'detail' => get_string('stat_courses_detail', 'local_timemachine', $distinctcourses),
     ],
     [
-        'label' => 'Spazio totale su disco',
+        'label' => get_string('stat_totalsize', 'local_timemachine'),
         'value' => display_size($totalbytes),
-        'detail' => ''
+        'detail' => '',
     ],
     [
-        'label' => 'Backup dall\'ultimo riepilogo (' . $sinceLabel . ')',
+        'label' => get_string('stat_since_last', 'local_timemachine', $sincelabel),
         'value' => $backupsince,
-        'detail' => ''
+        'detail' => '',
     ],
 ];
 foreach ($cards as $card) {
@@ -124,20 +130,6 @@ foreach ($cards as $card) {
 }
 echo html_writer::end_div();
 
-// Minimal CSS/JS for expand/collapse grouped rows.
-echo html_writer::tag('style',
-    '.tm-toggle{cursor:pointer;display:inline-flex;align-items:center}' .
-    '.tm-child{display:none}.tm-main{border-left:4px solid transparent}' .
-    '.tm-child-row{opacity:.95}.tm-arrow{margin-right:6px;display:inline-block}' .
-    '.tm-stats{margin-top:10px;margin-bottom:18px}' .
-    '.tm-stat-card{background:#f8fafc;border:1px solid #dfe5ec;border-radius:10px;padding:18px;box-shadow:0 2px 4px rgba(0,0,0,0.06);height:100%}' .
-    '.tm-stat-label{font-size:0.95rem;color:#4a5568;margin-bottom:6px;font-weight:600}' .
-    '.tm-stat-value{font-size:1.4rem;font-weight:700;color:#1a202c}' .
-    '.tm-stat-detail{font-size:0.85rem;color:#6b7280}' .
-    '.tm-search{margin-bottom:12px}',
-    []
-);
-
 // Search form.
 echo html_writer::start_tag('form', ['method' => 'get', 'action' => $pageurl->out(false), 'class' => 'tm-search']);
 echo html_writer::start_tag('div', ['class' => 'form-inline']);
@@ -151,10 +143,10 @@ echo html_writer::empty_tag('input', [
 echo html_writer::empty_tag('input', [
     'type' => 'submit',
     'value' => get_string('search'),
-    'class' => 'btn btn-primary ml-2'
+    'class' => 'btn btn-primary ml-2',
 ]);
 echo html_writer::link(new moodle_url($pageurl, ['search' => '']), get_string('clearsearch', 'local_timemachine'), [
-    'class' => 'btn btn-secondary ml-2'
+    'class' => 'btn btn-secondary ml-2',
 ]);
 echo html_writer::end_tag('div');
 echo html_writer::end_tag('form');
@@ -215,15 +207,12 @@ foreach ($groups as $cid => $g) {
     $latest = $backups[0];
     $count = count($backups);
     $toggle = '';
-    $hue = ($cid * 57) % 360; // stable tint per course.
+    $hue = ($cid * 57) % 360; // Stable tint per course.
     $mainstyle = 'background-color:hsl(' . $hue . ',60%,96%);border-left-color:hsl(' . $hue . ',60%,60%)';
     $childstyle = 'background-color:hsl(' . $hue . ',60%,99%)';
     if ($count > 1) {
-        $sm = get_string_manager();
-        $expandtitle = $sm->string_exists('expandversions', 'local_timemachine') ?
-            get_string('expandversions', 'local_timemachine') : 'Show all versions';
-        $collapsetitle = $sm->string_exists('collapseversions', 'local_timemachine') ?
-            get_string('collapseversions', 'local_timemachine') : 'Hide versions';
+        $expandtitle = get_string('expandversions', 'local_timemachine');
+        $collapsetitle = get_string('collapseversions', 'local_timemachine');
         $icon = $OUTPUT->pix_icon('t/collapsed', $expandtitle, 'moodle', ['class' => 'icon']);
         $collapsedurl = $OUTPUT->image_url('t/collapsed', 'moodle')->out(false);
         $expandedurl = $OUTPUT->image_url('t/expanded', 'moodle')->out(false);
@@ -309,51 +298,5 @@ if (empty($table->data)) {
 } else {
     echo html_writer::table($table);
 }
-
-// Robust toggle handler that does not rely on quoted CSS attribute selectors.
-echo html_writer::tag('script', '
-document.addEventListener("click", function(e){
-  var a = e.target.closest("a.tm-toggle");
-  if(!a){return;}
-  e.preventDefault();
-  var cid = a.getAttribute("data-courseid");
-  var expanded = a.getAttribute("aria-expanded") === "true";
-  document.querySelectorAll("tr.tm-child").forEach(function(tr){
-    if (tr.getAttribute("data-parent") == cid) {
-      tr.style.display = expanded ? "none" : "table-row";
-    }
-  });
-  a.setAttribute("aria-expanded", expanded ? "false" : "true");
-  var icon = a.querySelector("img, i");
-  if (icon) {
-    var urlCollapsed = a.getAttribute("data-icon-collapsed");
-    var urlExpanded = a.getAttribute("data-icon-expanded");
-    if (icon.tagName.toLowerCase() === "img") {
-      icon.setAttribute("src", expanded ? urlCollapsed : urlExpanded);
-    } else if (icon.classList) {
-      var classCollapsed = a.getAttribute("data-icon-class-collapsed");
-      var classExpanded = a.getAttribute("data-icon-class-expanded");
-      if (classCollapsed && classExpanded) {
-        icon.classList.remove(expanded ? classExpanded : classCollapsed);
-        icon.classList.add(expanded ? classCollapsed : classExpanded);
-      }
-    }
-  }
-  // Update title so it reflects the next action for users.
-  var titleExpand = a.getAttribute("data-title-expand") || "";
-  var titleCollapse = a.getAttribute("data-title-collapse") || "";
-  a.setAttribute("title", expanded ? titleExpand : titleCollapse);
-});
-
-// Confirmation dialogs for destructive actions.
-document.addEventListener("click", function(e){
-  var link = e.target.closest("a.tm-confirm");
-  if(!link){return;}
-  var msg = link.getAttribute("data-confirm") || "";
-  if (msg && !confirm(msg)) {
-    e.preventDefault();
-  }
-});
-', []);
 
 echo $OUTPUT->footer();

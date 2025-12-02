@@ -16,25 +16,33 @@
 
 namespace local_timemachine\task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Scheduled task that sends the daily backup summary email.
  *
  * @package   local_timemachine
- * @copyright 2025 zMoodle (https://app.zmoodle.com)
+ * @copyright 2025 GiDA
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class send_summary extends \core\task\scheduled_task {
+    /**
+     * Task name.
+     *
+     * @return string
+     */
     public function get_name() {
         return get_string('task_send_summary', 'local_timemachine');
     }
 
+    /**
+     * Execute daily summary sending.
+     *
+     * @return void
+     */
     public function execute() {
         try {
             \local_timemachine\local\backupper::send_daily_summary();
         } catch (\Throwable $e) {
-            mtrace('local_timemachine: summary task error - ' . $e->getMessage());
+            mtrace('local_timemachine: ' . get_string('task_error_send_summary', 'local_timemachine', $e->getMessage()));
             if ((int)\get_config('local_timemachine', 'verbose')) {
                 mtrace($e->getTraceAsString());
             }

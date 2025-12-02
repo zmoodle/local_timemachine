@@ -16,28 +16,31 @@
 
 namespace local_timemachine\task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Adhoc task to back up a single course.
  *
  * @package   local_timemachine
- * @copyright 2025 zMoodle (https://app.zmoodle.com)
+ * @copyright 2025 GiDA
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_single_course extends \core\task\adhoc_task {
+    /**
+     * Execute adhoc backup task.
+     *
+     * @return void
+     */
     public function execute() {
         $data = $this->get_custom_data();
         $courseid = isset($data->courseid) ? (int)$data->courseid : 0;
         $runid = isset($data->runid) ? (string)$data->runid : null;
         if (!$courseid) {
-            mtrace('local_timemachine: adhoc task missing courseid');
+            mtrace('local_timemachine: ' . get_string('task_missing_courseid', 'local_timemachine'));
             return;
         }
         try {
             \local_timemachine\local\backupper::maybe_backup_course($courseid);
         } catch (\Throwable $e) {
-            mtrace('local_timemachine: adhoc error for course ' . $courseid . ': ' . $e->getMessage());
+            mtrace('local_timemachine: ' . get_string('task_error_single_course', 'local_timemachine', (object)['courseid' => $courseid, 'message' => $e->getMessage()]));
             if ((int)\get_config('local_timemachine', 'verbose')) {
                 mtrace($e->getTraceAsString());
             }

@@ -18,7 +18,7 @@
  * Settings for local_timemachine.
  *
  * @package   local_timemachine
- * @copyright 2025 zMoodle (https://app.zmoodle.com)
+ * @copyright 2025 GiDA
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -33,8 +33,11 @@ if ($hassiteconfig) {
         'local/timemachine:manage'
     ));
 
-    $settings = new admin_settingpage('local_timemachine', get_string('pluginname', 'local_timemachine'),
-        'local/timemachine:manage');
+    $settings = new admin_settingpage(
+        'local_timemachine',
+        get_string('pluginname', 'local_timemachine'),
+        'local/timemachine:manage'
+    );
     $ADMIN->add('localplugins', $settings);
 
     // Categories to back up (multi-select). Falls back to legacy single 'categoryid' default if present.
@@ -116,29 +119,73 @@ if ($hassiteconfig) {
     $settings->add($sret);
 
     // Backup content toggles.
-    $settings->add(new admin_setting_configcheckbox('local_timemachine/backup_users',
-        get_string('setting_backup_users', 'local_timemachine'), '', 0));
-    $settings->add(new admin_setting_configcheckbox('local_timemachine/backup_role_assignments',
-        get_string('setting_backup_role_assignments', 'local_timemachine'), '', 0));
-    $settings->add(new admin_setting_configcheckbox('local_timemachine/backup_activities',
-        get_string('setting_backup_activities', 'local_timemachine'), '', 1));
-    $settings->add(new admin_setting_configcheckbox('local_timemachine/backup_blocks',
-        get_string('setting_backup_blocks', 'local_timemachine'), '', 1));
-    $settings->add(new admin_setting_configcheckbox('local_timemachine/backup_filters',
-        get_string('setting_backup_filters', 'local_timemachine'), '', 1));
-    $settings->add(new admin_setting_configcheckbox('local_timemachine/backup_comments',
-        get_string('setting_backup_comments', 'local_timemachine'), '', 0));
-    $settings->add(new admin_setting_configcheckbox('local_timemachine/backup_badges',
-        get_string('setting_backup_badges', 'local_timemachine'), '', 0));
-    $settings->add(new admin_setting_configcheckbox('local_timemachine/backup_calendarevents',
-        get_string('setting_backup_calendarevents', 'local_timemachine'), '', 1));
-    $settings->add(new admin_setting_configcheckbox('local_timemachine/backup_userscompletion',
-        get_string('setting_backup_userscompletion', 'local_timemachine'), '', 0));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_timemachine/backup_users',
+        get_string('setting_backup_users', 'local_timemachine'),
+        '',
+        0
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_timemachine/backup_role_assignments',
+        get_string('setting_backup_role_assignments', 'local_timemachine'),
+        '',
+        0
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_timemachine/backup_activities',
+        get_string('setting_backup_activities', 'local_timemachine'),
+        '',
+        1
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_timemachine/backup_blocks',
+        get_string('setting_backup_blocks', 'local_timemachine'),
+        '',
+        1
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_timemachine/backup_filters',
+        get_string('setting_backup_filters', 'local_timemachine'),
+        '',
+        1
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_timemachine/backup_comments',
+        get_string('setting_backup_comments', 'local_timemachine'),
+        '',
+        0
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_timemachine/backup_badges',
+        get_string('setting_backup_badges', 'local_timemachine'),
+        '',
+        0
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_timemachine/backup_calendarevents',
+        get_string('setting_backup_calendarevents', 'local_timemachine'),
+        '',
+        1
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'local_timemachine/backup_userscompletion',
+        get_string('setting_backup_userscompletion', 'local_timemachine'),
+        '',
+        0
+    ));
 
     // Failure handling + notifications.
-    $settings->add(new admin_setting_configcheckbox('local_timemachine/notifyonfail',
-        get_string('setting_notifyonfail', 'local_timemachine'), '', 1));
-    $settings->add(new admin_setting_configtext('local_timemachine/notifyfailthreshold',
+    $settings->add(new admin_setting_configcheckbox(
+        'local_timemachine/notifyonfail',
+        get_string('setting_notifyonfail', 'local_timemachine'),
+        '',
+        1
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_timemachine/notifyfailthreshold',
         get_string('setting_notifyfailthreshold', 'local_timemachine'),
-        get_string('setting_notifyfailthreshold_desc', 'local_timemachine'), 3, PARAM_INT));
+        get_string('setting_notifyfailthreshold_desc', 'local_timemachine'),
+        3,
+        PARAM_INT
+    ));
 }

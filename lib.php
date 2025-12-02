@@ -18,11 +18,9 @@
  * Library callbacks for local_timemachine.
  *
  * @package   local_timemachine
- * @copyright 2025 zMoodle (https://app.zmoodle.com)
+ * @copyright 2025 GiDA
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Triggered when retention setting changes.

@@ -18,7 +18,7 @@
  * Log viewer for Moodle Time Machine.
  *
  * @package   local_timemachine
- * @copyright 2025 zMoodle (https://app.zmoodle.com)
+ * @copyright 2025 GiDA
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -53,7 +53,7 @@ echo html_writer::empty_tag('input', [
     'id' => 'since',
     'value' => (int)$since,
     'class' => 'form-control ml-2',
-    'style' => 'max-width:200px'
+    'style' => 'max-width:200px',
 ]);
 echo html_writer::label(get_string('log_courseid', 'local_timemachine'), 'courseid', false, ['class' => 'ml-3']);
 echo html_writer::empty_tag('input', [
@@ -62,20 +62,26 @@ echo html_writer::empty_tag('input', [
     'id' => 'courseid',
     'value' => (int)$courseid,
     'class' => 'form-control ml-2',
-    'style' => 'max-width:200px'
+    'style' => 'max-width:200px',
 ]);
 echo html_writer::empty_tag('input', [
     'type' => 'submit',
     'value' => get_string('search'),
-    'class' => 'btn btn-primary ml-3'
+    'class' => 'btn btn-primary ml-3',
 ]);
 echo html_writer::end_tag('div');
 echo html_writer::end_tag('form');
 
 $params = [];
 $where = '1=1';
-if ($since > 0) { $where .= ' AND l.timecreated > :t'; $params['t'] = $since; }
-if ($courseid > 0) { $where .= ' AND l.courseid = :cid'; $params['cid'] = $courseid; }
+if ($since > 0) {
+    $where .= ' AND l.timecreated > :t';
+    $params['t'] = $since;
+}
+if ($courseid > 0) {
+    $where .= ' AND l.courseid = :cid';
+    $params['cid'] = $courseid;
+}
 
 $sql = "
     SELECT l.id, l.timecreated, l.courseid, l.level, l.message, l.details, l.runid,
@@ -97,11 +103,14 @@ if (!$logs) {
         get_string('log_course', 'local_timemachine'),
         get_string('level'),
         get_string('message'),
-        get_string('details')
+        get_string('details'),
     ];
     foreach ($logs as $l) {
-        $time = userdate((int)$l->timecreated, '%Y-%m-%d %H:%M:%S');
-        $course = $l->coursename ? $l->coursename . ' (ID ' . $l->courseid . ')' : ('ID ' . $l->courseid);
+        $format = get_string('strftimedatetime', 'langconfig');
+        $time = userdate((int)$l->timecreated, $format);
+        $course = $l->coursename
+            ? get_string('log_course_with_id', 'local_timemachine', (object)['name' => $l->coursename, 'id' => $l->courseid])
+            : get_string('log_courseid_only', 'local_timemachine', $l->courseid);
         $details = '';
         if (!empty($l->details)) {
             $details = html_writer::tag('pre', s($l->details), ['style' => 'max-height:200px;overflow:auto']);

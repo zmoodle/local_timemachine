@@ -25,5 +25,4 @@ Security and robustness
 - Retention and cleanup use guarded deletions to avoid touching files outside the plugin storage
 - FTP upload is optional, validated for readable files and avoids logging credentials
 
-Maintainer
-- zMoodle (https://app.zmoodle.com)
+

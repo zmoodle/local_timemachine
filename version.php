@@ -18,15 +18,15 @@
  * Plugin version metadata.
  *
  * @package   local_timemachine
- * @copyright 2025 zMoodle (https://app.zmoodle.com)
+ * @copyright 2025 GiDA
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_timemachine';
-$plugin->version   = 2025111200; // YYYYMMDDXX.
+$plugin->version   = 2025111300; // YYYYMMDDXX.
 $plugin->requires  = 2024100700; // Moodle 4.5 or later.
 $plugin->supported = [405, 500];
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.0.1';
+$plugin->release   = '1.0.2';

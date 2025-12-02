@@ -14,13 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Upgrade script for local_timemachine.
  *
  * @param int $oldversion
  * @return bool
+ * @package   local_timemachine
+ * @copyright 2025 GiDA
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 function xmldb_local_timemachine_upgrade(int $oldversion): bool {
     global $DB;
@@ -126,8 +127,10 @@ function xmldb_local_timemachine_upgrade(int $oldversion): bool {
         // Clear any delayed adhoc tasks created during previous failures, so they run immediately.
         // Also reset fail counters (previous errors were due to code changes).
         $classname = '\\local_timemachine\\task\\backup_single_course';
-        $DB->execute("UPDATE {task_adhoc} SET nextruntime = 0 WHERE classname = :cn OR component = :comp",
-            ['cn' => $classname, 'comp' => 'local_timemachine']);
+        $DB->execute(
+            "UPDATE {task_adhoc} SET nextruntime = 0 WHERE classname = :cn OR component = :comp",
+            ['cn' => $classname, 'comp' => 'local_timemachine']
+        );
         $DB->execute("UPDATE {local_timemachine_course} SET failcount = 0, lastnotified = NULL", []);
         upgrade_plugin_savepoint(true, 2025102806, 'local', 'timemachine');
     }
@@ -169,6 +172,11 @@ function xmldb_local_timemachine_upgrade(int $oldversion): bool {
     if ($oldversion < 2025111200) {
         // General hardening and metadata refresh.
         upgrade_plugin_savepoint(true, 2025111200, 'local', 'timemachine');
+    }
+
+    if ($oldversion < 2025111300) {
+        // Coding standard fixes release.
+        upgrade_plugin_savepoint(true, 2025111300, 'local', 'timemachine');
     }
 
     return true;

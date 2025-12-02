@@ -16,30 +16,36 @@
 
 namespace local_timemachine\task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Adhoc task enforcing retention limits across all courses.
  *
  * @package   local_timemachine
- * @copyright 2025 zMoodle (https://app.zmoodle.com)
+ * @copyright 2025 GiDA
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class enforce_retention extends \core\task\adhoc_task {
+    /**
+     * Execute retention enforcement.
+     *
+     * @return void
+     */
     public function execute() {
         global $DB;
         $keep = (int)\get_config('local_timemachine', 'retentionversions');
         if ($keep <= 0) {
             $keep = \local_timemachine\local\backupper::MAX_VERSIONS;
         }
-        mtrace('local_timemachine: enforcing retention for all courses (keep=' . $keep . ')');
+        mtrace('local_timemachine: ' . get_string('task_enforce_retention_start', 'local_timemachine', $keep));
         $sql = 'SELECT DISTINCT courseid FROM {local_timemachine_backup}';
         $courseids = $DB->get_records_sql($sql);
         foreach ($courseids as $c) {
             try {
                 \local_timemachine\local\backupper::enforce_retention((int)$c->courseid);
             } catch (\Throwable $e) {
-                mtrace('local_timemachine: retention error for course ' . $c->courseid . ': ' . $e->getMessage());
+                mtrace('local_timemachine: ' . get_string('task_enforce_retention_error', 'local_timemachine', (object)[
+                    'courseid' => $c->courseid,
+                    'message' => $e->getMessage(),
+                ]));
             }
         }
     }

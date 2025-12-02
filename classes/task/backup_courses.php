@@ -16,25 +16,33 @@
 
 namespace local_timemachine\task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Scheduled task to queue backups for configured categories.
  *
  * @package   local_timemachine
- * @copyright 2025 zMoodle (https://app.zmoodle.com)
+ * @copyright 2025 GiDA
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_courses extends \core\task\scheduled_task {
+    /**
+     * Task name.
+     *
+     * @return string
+     */
     public function get_name() {
         return get_string('task_backup_courses', 'local_timemachine');
     }
 
+    /**
+     * Execute scheduled backup queueing.
+     *
+     * @return void
+     */
     public function execute() {
         try {
             \local_timemachine\local\backupper::run_scheduled_backup();
         } catch (\Throwable $e) {
-            mtrace('local_timemachine: fatal error in task - ' . $e->getMessage());
+            mtrace('local_timemachine: ' . get_string('task_error_backup_courses', 'local_timemachine', $e->getMessage()));
             if ((int)get_config('local_timemachine', 'verbose')) {
                 mtrace($e->getTraceAsString());
             }

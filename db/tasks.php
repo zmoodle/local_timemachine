@@ -14,6 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Scheduled task definitions for local_timemachine.
+ *
+ * @package   local_timemachine
+ * @copyright 2025 GiDA
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 defined('MOODLE_INTERNAL') || die();
 
 $tasks = [
@@ -24,7 +31,7 @@ $tasks = [
         'hour' => '2',
         'day' => '*',
         'dayofweek' => '*',
-        'month' => '*'
+        'month' => '*',
     ],
     [
         'classname' => '\\local_timemachine\\task\\send_summary',
@@ -33,6 +40,6 @@ $tasks = [
         'hour' => '3',
         'day' => '*',
         'dayofweek' => '*',
-        'month' => '*'
+        'month' => '*',
     ],
 ];

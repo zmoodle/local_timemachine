@@ -16,16 +16,19 @@
 
 namespace local_timemachine\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Privacy provider for local_timemachine.
  *
  * @package   local_timemachine
- * @copyright 2025 zMoodle (https://app.zmoodle.com)
+ * @copyright 2025 GiDA
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements \core_privacy\local\metadata\null_provider {
+    /**
+     * Provide reason for no data storage.
+     *
+     * @return string
+     */
     public static function get_reason(): string {
         return 'privacy:metadata';
     }

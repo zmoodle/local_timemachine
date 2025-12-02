@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XMLDB PATH="local/timemachine/db" VERSION="2025111200" COMMENT="XMLDB file for local_timemachine" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://docs.moodle.org/xmldb/xmldb.xsd">
+<XMLDB PATH="local/timemachine/db" VERSION="2025111300" COMMENT="XMLDB file for local_timemachine" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://docs.moodle.org/xmldb/xmldb.xsd">
   <TABLES>
     <TABLE NAME="local_timemachine_course" COMMENT="Per-course signatures and last backup info">
       <FIELDS>
