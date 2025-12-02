@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_timemachine';
-$plugin->version   = 2025111300; // YYYYMMDDXX.
+$plugin->version   = 2025120200; // YYYYMMDDXX.
 $plugin->requires  = 2024100700; // Moodle 4.5 or later.
 $plugin->supported = [405, 500];
 $plugin->maturity  = MATURITY_STABLE;
